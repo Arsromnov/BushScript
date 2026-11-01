@@ -1,6 +1,10 @@
 log "hello world"
 
-def x "str"
+let x "str"
+let y 1
+let u 12
+
+math y + u x
 
 log "hello" x
 

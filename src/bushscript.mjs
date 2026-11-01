@@ -1,7 +1,7 @@
-import * as std from 'qjs:std';
+import * as std from "qjs:std";
 
 /* 
-            BushScript 0.1.00, released 31.10.26
+            BushScript 0.1.10, released 1.11.26
                   developed by arsromnov
                      USE MIT LICENSE!
 */
@@ -73,13 +73,48 @@ for (let index in lines) {
       const toLog = tokens.slice(1).map(getStrType);
       std.printf("%s\n", toLog.join(" "));
       break;
-    case "def":
-      const varName = tokens[1]  
-      const varValue = getStrType(tokens[2])
-      storage[varName] = varValue
+    case "let":
+      const varName = tokens[1];
+      const varValue = getStrType(tokens[2]);
+      storage[varName] = varValue;
+      break;
+    case "math":
+      const intFirst = getStrType(tokens[1]);
+      const operationType = tokens[2];
+      const intSecond = getStrType(tokens[3]);
+      const target = tokens[4];
+
+      if (!target) {
+        std.printf("[BSH] can`t found target variable ");
+        std.exit(1);
+      }
+
+      switch (operationType) {
+        case "+":
+          storage[target] = intFirst + intSecond;
+          break;
+        case "-":
+          storage[target] = intFirst - intSecond;
+          break;
+        case "/":
+          if (intSecond === 0) {
+            std.printf("[BSH] can`t divide by zero ");
+            std.exit(1);
+          }
+
+          storage[target] = intFirst / intSecond;
+          break;
+        case "*":
+          storage[target] = intFirst * intSecond;
+          break;
+        default:
+          std.printf("[BSH] cant found operation");
+          break;
+      }
+
       break;
     default:
-      std.printf("[BSH] cant found syntax")
+      std.printf("[BSH] cant found syntax");
       break;
   }
 }
