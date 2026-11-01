@@ -6,3 +6,6 @@
 see example and syntax [here](docs/welcome.md)
 
 
+## how to use bsh.exe
+
+bsh yourfile.bsh

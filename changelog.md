@@ -1,18 +1,24 @@
+### 0.1.20
+
+> - minor update and bugfix
+
+
 ### 0.1.10 - a math update
 
-> + add main math operations
+> - added main math operations
 
-> + add documentation
+> - added documentation
 
->
+> - minor changes
 
-
-
+1.11.2026
 
 ### 0.1.00 - initial release
 
-> + variables
+> - added variables
 
-> + "log" command
+> - added the "log" command
 
-> + base of lang
+> - created the base of lang
+
+31.10.2026

@@ -1,9 +1,9 @@
 import * as std from "qjs:std";
 
 /* 
-            BushScript 0.1.10, released 1.11.26
+            BushScript 0.1.20, released 1.11.26
                   developed by arsromnov
-                     USE MIT LICENSE!
+                     USES MIT LICENSE!
 */
 
 //arguments
@@ -13,8 +13,15 @@ if (args.length < 2) {
   std.printf("[BSH] use << bsh <yourfile.bsh> >> ");
   std.exit(1);
 }
+//flags
+if (args[1] === "--version") {
+  std.printf("BushScript 0.1.20, released 1.11.26")
+  std.printf("      developed by arsromnov       ")
+  std.printf("        USES MIT LICENSE!          ")
+  std.exit(1);
+}
 //file
-const filename = args[2];
+const filename = args[1];
 const file = std.open(filename, "r");
 
 if (!file) {

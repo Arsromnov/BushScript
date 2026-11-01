@@ -1,4 +1,2 @@
-::VARIABLES 
-set QJS=src\qjs.exe
-set BSH=src\bushscript.mjs
-set SCRIPT=src\test.bsh
+cd src
+qjs.exe bushscript.js ../ test.bsh

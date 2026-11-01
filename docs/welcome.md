@@ -6,7 +6,7 @@
 
 
 
-## go to
+## learn bsh!
 [basics](basics.md)
 
 
@@ -16,4 +16,3 @@
 
 
 
-`log "hello world"`
