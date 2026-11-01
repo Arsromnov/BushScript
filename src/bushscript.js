@@ -1,7 +1,7 @@
 import * as std from "qjs:std";
 
 /* 
-            BushScript 0.1.20, released 1.11.26
+            BushScript 0.1.25, released 1.11.26
                   developed by arsromnov
                      USES MIT LICENSE!
 */
@@ -15,9 +15,9 @@ if (args.length < 2) {
 }
 //flags
 if (args[1] === "--version") {
-  std.printf("BushScript 0.1.20, released 1.11.26")
-  std.printf("      developed by arsromnov       ")
-  std.printf("        USES MIT LICENSE!          ")
+  console.log("BushScript 0.1.25, released 1.11.26")
+  console.log("      developed by arsromnov       ")
+  console.log("        USES MIT LICENSE!          ")
   std.exit(1);
 }
 //file

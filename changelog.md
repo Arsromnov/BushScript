@@ -1,3 +1,9 @@
+### 0.1.25
+
+> - minor update and build bugfix
+
+
+
 ### 0.1.20
 
 > - minor update and bugfix
