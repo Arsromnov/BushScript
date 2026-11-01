@@ -1,0 +1,7 @@
+log "hello world"
+
+def x "str"
+
+log "hello" x
+
+--awesome comment!
