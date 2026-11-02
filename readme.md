@@ -2,10 +2,12 @@
 >its simple try to create programming lang use quickJS
 
 
-## want to start?
+## wanna start?
 see example and syntax [here](docs/welcome.md)
 
 
-## how to use bsh.exe
+## how to use bsh.exe?
 
-bsh yourfile.bsh
+`bsh yourfile.bsh`
+
+and flags `bsh --version`

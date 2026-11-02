@@ -1,13 +1,22 @@
+### 0.1.30
+
+> - added wait command
+
+> - added goto command
+
+> - changed variables syntax
+
+> - arguments support (in lang)
+
+2.11.25
+
 ### 0.1.25
 
 > - minor update and build bugfix
 
-
-
 ### 0.1.20
 
 > - minor update and bugfix
-
 
 ### 0.1.10 - a math update
 

@@ -1,13 +1,17 @@
 import * as std from "qjs:std";
+import * as os from "qjs:os";
+import { printf } from "std";
 
 /* 
-            BushScript 0.1.25, released 1.11.26
+            BushScript 0.1.30, released 2.11.26
                   developed by arsromnov
                      USES MIT LICENSE!
 */
 
 //arguments
 const args = scriptArgs;
+//current line
+let index = 0;
 //structure check
 if (args.length < 2) {
   std.printf("[BSH] use << bsh <yourfile.bsh> >> ");
@@ -15,9 +19,9 @@ if (args.length < 2) {
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.1.25, released 1.11.26")
-  console.log("      developed by arsromnov       ")
-  console.log("        USES MIT LICENSE!          ")
+  console.log("BushScript 0.1.30, released 2.11.26");
+  console.log("      developed by arsromnov       ");
+  console.log("        USES MIT LICENSE!          ");
   std.exit(1);
 }
 //file
@@ -64,16 +68,23 @@ function getStrType(token) {
   return token;
 }
 
-const lines = fileContent.split("\n");
+const lines = fileContent.split('\n');
 
-for (let index in lines) {
+while (index < lines.length) {
   let line = lines[index].trim();
-  if (!line || line.startsWith("--")) continue;
+  if (!line || line.startsWith("--")) {
+    index++;
+    continue;
+  }
 
   const tokens = parseLine(line);
-  if (tokens.length === 0) continue;
+  if (tokens.length === 0) {
+    index++;
+    continue;
+  }
 
   const instr = tokens[0];
+  let jumped = false;
 
   switch (instr) {
     case "log":
@@ -82,8 +93,13 @@ for (let index in lines) {
       break;
     case "let":
       const varName = tokens[1];
-      const varValue = getStrType(tokens[2]);
-      storage[varName] = varValue;
+      const operator = tokens[2];
+      const varValue = getStrType(tokens[3]);
+      if (operator == "=") {
+        storage[varName] = varValue;
+      } else {
+        std.printf("[BSH] invalid syntax")
+      }
       break;
     case "math":
       const intFirst = getStrType(tokens[1]);
@@ -120,8 +136,37 @@ for (let index in lines) {
       }
 
       break;
+    case "goto":
+      const lineNumber = getStrType(tokens[1]);
+
+      if (
+        typeof lineNumber !== "number" ||
+        lineNumber > lines.length ||
+        lineNumber < 0
+      ) {
+        std.printf("[BSH] invalid goto line number on %s\n", index);
+        std.exit(1);
+      }
+
+      index = lineNumber - 1;
+      jumped = true;
+      break;
+    case "wait":
+      const ms = getStrType(tokens[1]);
+
+      if (typeof ms !== "number" || ms < 0) {
+        std.printf("[BSH] invalid wait time number on %s\n", index);
+        std.exit(1);
+      }
+
+      os.sleep(ms);
+      break;
     default:
       std.printf("[BSH] cant found syntax");
       break;
+  }
+
+  if (!jumped) {
+    index++;
   }
 }

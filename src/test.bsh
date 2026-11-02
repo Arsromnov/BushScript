@@ -1,11 +1,17 @@
 log "hello world"
 
-let x "str"
-let y 1
-let u 12
+let x = "world"
+let y = 1
+let u = 12
 
 math y + u x
 
 log "hello" x
+log "pls wait 5 seconds"
+wait 5000
+log "done"
 
 --awesome comment!
+
+
+
