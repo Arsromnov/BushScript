@@ -1,3 +1,7 @@
+### 0.1.45
+
+> - minor updates and bugfix
+
 ### 0.1.40
 
 > - added standard library methods

@@ -13,11 +13,6 @@ log "and"
 let name = std.read "pls write your name -->"
 log "hello " name "!"
 
-
-if name = "" {
-    log "mmmmm"
-}
-
 --awesome comment!
 
 log "random number"
