@@ -1,3 +1,13 @@
+### 0.1.40
+
+> - added standard library methods
+
+> - change the math function work
+
+> - added arguments support (in lang)
+
+3.11.2026
+
 ### 0.1.30
 
 > - added wait command
@@ -6,17 +16,16 @@
 
 > - changed variables syntax
 
-> - arguments support (in lang)
 
-2.11.25
+2.11.2026
 
 ### 0.1.25
 
-> - minor update and build bugfix
+> - minor updates and build bugfix
 
 ### 0.1.20
 
-> - minor update and bugfix
+> - minor updates and bugfix
 
 ### 0.1.10 - a math update
 

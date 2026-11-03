@@ -1,9 +1,8 @@
 import * as std from "qjs:std";
 import * as os from "qjs:os";
-import { printf } from "std";
 
 /* 
-            BushScript 0.1.30, released 2.11.26
+            BushScript 0.1.40, released 3.11.26
                   developed by arsromnov
                      USES MIT LICENSE!
 */
@@ -19,7 +18,7 @@ if (args.length < 2) {
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.1.30, released 2.11.26");
+  console.log("BushScript 0.1.40, released 3.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
   std.exit(1);
@@ -68,7 +67,7 @@ function getStrType(token) {
   return token;
 }
 
-const lines = fileContent.split('\n');
+const lines = fileContent.split("\n");
 
 while (index < lines.length) {
   let line = lines[index].trim();
@@ -91,51 +90,75 @@ while (index < lines.length) {
       const toLog = tokens.slice(1).map(getStrType);
       std.printf("%s\n", toLog.join(" "));
       break;
+
+    //variable declaration command
     case "let":
       const varName = tokens[1];
       const operator = tokens[2];
-      const varValue = getStrType(tokens[3]);
-      if (operator == "=") {
-        storage[varName] = varValue;
-      } else {
-        std.printf("[BSH] invalid syntax")
-      }
-      break;
-    case "math":
-      const intFirst = getStrType(tokens[1]);
-      const operationType = tokens[2];
-      const intSecond = getStrType(tokens[3]);
-      const target = tokens[4];
+      const varAction = tokens[3];
 
-      if (!target) {
-        std.printf("[BSH] can`t found target variable ");
+      if (operator !== "=") {
+        std.printf("[BSH] invalid syntax on %s\n", index);
         std.exit(1);
       }
 
-      switch (operationType) {
-        case "+":
-          storage[target] = intFirst + intSecond;
-          break;
-        case "-":
-          storage[target] = intFirst - intSecond;
-          break;
-        case "/":
-          if (intSecond === 0) {
-            std.printf("[BSH] can`t divide by zero ");
-            std.exit(1);
-          }
+      //readline method
+      if (varAction === "std.read") {
+        const toWrite = tokens[4];
+        std.out.puts(getStrType(toWrite));
+        std.out.flush();
+        let input = std.in.getline();
+        storage[varName] = input;
+      } else if (varAction === "math.randomInt") {
+        //generating random int method
+        const min = getStrType(tokens[4]);
+        const max = getStrType(tokens[5]);
+        const result = Math.floor(Math.random() * (max - min + 1)) + min;
 
-          storage[target] = intFirst / intSecond;
-          break;
-        case "*":
-          storage[target] = intFirst * intSecond;
-          break;
-        default:
-          std.printf("[BSH] cant found operation");
-          break;
+        storage[varName] = result;
+      } else if (varAction === "math.calc") {
+        //calc method
+        const intFirst = getStrType(tokens[4]);
+        const operationType = tokens[5];
+        const intSecond = getStrType(tokens[6]);
+
+        switch (operationType) {
+          case "+":
+            storage[varName] = intFirst + intSecond;
+            break;
+          case "-":
+            storage[varName] = intFirst - intSecond;
+            break;
+          case "/":
+            if (intSecond === 0) {
+              std.printf("[BSH] cant`t divide by zero %s\n", index);
+              std.exit(1);
+            }
+
+            storage[varName] = intFirst / intSecond;
+            break;
+          case "*":
+            storage[varName] = intFirst * intSecond;
+            break;
+          default:
+            std.printf("[BSH] cant`t found operator %s\n", index);
+            break;
+        }
+      } else if (varAction === "std.getScriptArg") {
+        const num = getStrType(tokens[4]);
+        if (args[num] !== undefined && !isNaN(num)) {
+          storage[varName] = args[num];
+        } else {
+          std.printf("[BSH] invalid argument to method on %s\n", index);
+        }
+
+      } else {
+        storage[varName] = getStrType(varAction);
       }
 
       break;
+
+    //goto command
     case "goto":
       const lineNumber = getStrType(tokens[1]);
 
@@ -144,13 +167,14 @@ while (index < lines.length) {
         lineNumber > lines.length ||
         lineNumber < 0
       ) {
-        std.printf("[BSH] invalid goto line number on %s\n", index);
+        std.printf("[BSH] invalid syntax on %s\n", index);
         std.exit(1);
       }
 
       index = lineNumber - 1;
       jumped = true;
       break;
+    //wait command
     case "wait":
       const ms = getStrType(tokens[1]);
 
@@ -162,7 +186,7 @@ while (index < lines.length) {
       os.sleep(ms);
       break;
     default:
-      std.printf("[BSH] cant found syntax");
+      std.printf("[BSH] unknown syntax on %s\n", index);
       break;
   }
 

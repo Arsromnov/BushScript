@@ -18,10 +18,13 @@
 
 > prints variables
 
-`math <int> <operation> <int> <variable for saving result>`
-`math 1 + 1 x`
+`let x = math.calc <num> + <num>`
+`let x = math.calc 1 + 1`
 
 >math operations
+
+`let x = math.randomInt <minNum> <maxNum>`
+`let x = math.random 0 1000`
 
 ## chapter 3 :: operators
 
@@ -29,3 +32,13 @@
 `goto 1`
 
 >goto 
+
+### chapter 4 :: other methods
+
+`let x = std.getScriptArg 1`
+
+/bsh test.bsh --file
+
+`let x = std.getScriptArg 1` (it be "test.bsh")
+
+>arguments support
