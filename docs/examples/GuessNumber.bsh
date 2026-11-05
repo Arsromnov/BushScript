@@ -1,0 +1,42 @@
+let random = math.randomInt 1 100
+let user = std.read "your num>"
+
+
+if user == random
+    log "win!" user "==" random
+    let more = std.read "try hard mode? (y/n) >"
+    toLowerCase more
+    log more
+    if more == y 
+        let randomH = math.randomInt 1 100
+        let userH = std.read "your num>"
+
+        if userH == randomH
+            log "<:
+        else 
+            if user > random 
+                log "<"
+            end
+            if user < random
+                log ">"
+            end  
+            
+            goto 12
+        end
+    end
+else
+
+    if user > random 
+        log "<"
+    end
+    if user < random
+        log ">"
+    end  
+
+    goto 2
+end    
+
+    
+
+
+

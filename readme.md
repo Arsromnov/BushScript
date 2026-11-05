@@ -1,5 +1,7 @@
 # welcome to bushscript repository!
->its simple try to create programming lang use quickJS
+>simple programming lang written on QuickJS
+
+![BushScript](src/bsh_logo.ico)
 
 
 ## wanna start?

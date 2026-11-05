@@ -1,3 +1,17 @@
+### 0.1.50
+
+> - added if/else conditions
+
+> - added new math method
+
+> - added exit command
+
+> - added tolowercase function
+
+> - added toNumber function
+
+4.11.2025
+
 ### 0.1.40
 
 > - added standard library methods
