@@ -2,7 +2,7 @@ import * as std from "qjs:std";
 import * as os from "qjs:os";
 
 /* 
-            BushScript 0.1.60, released 9.11.26
+            BushScript 0.1.65, released 9.11.26
                   developed by arsromnov
                      USES MIT LICENSE!
 */
@@ -18,7 +18,7 @@ if (args.length < 2) {
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.1.60, released 9.11.26");
+  console.log("BushScript 0.1.65, released 9.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
   std.exit(1);
@@ -457,7 +457,6 @@ while (index < lines.length) {
       functionStack.push({
         returnIndex: index + 1,
         endIndex: func.endIndex,
-        saved: argSaved,
         scopeDepth: scopes.length,
         prevBase: scopeBase
       })
