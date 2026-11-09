@@ -1,0 +1,6 @@
+import "Function.bsh"
+import "addLibrary.bsh"
+
+main "hello" "world"
+
+add 1 2

@@ -1,0 +1,4 @@
+fn add(a,b)
+    let result = math.calc a + b
+    log result
+end    

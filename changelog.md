@@ -1,3 +1,11 @@
+### 0.1.60
+
+> - bugfix
+> - added function`s system
+> - added local variables
+
+8.11.2026
+
 ### 0.1.50
 
 > - added if/else conditions
@@ -11,6 +19,10 @@
 > - added toNumber function
 
 4.11.2025
+
+### 0.1.45
+
+> - minor updates and bugfix
 
 ### 0.1.40
 

@@ -2,7 +2,7 @@ import * as std from "qjs:std";
 import * as os from "qjs:os";
 
 /* 
-            BushScript 0.1.50, released 5.11.26
+            BushScript 0.1.60, released 9.11.26
                   developed by arsromnov
                      USES MIT LICENSE!
 */
@@ -14,11 +14,11 @@ let index = 0;
 //structure check
 if (args.length < 2) {
   std.printf("[BSH] use << bsh <yourfile.bsh> >> ");
-  std.exit(1);
+  std.exit(0);
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.1.50, released 5.11.26");
+  console.log("BushScript 0.1.60, released 9.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
   std.exit(1);
@@ -28,16 +28,66 @@ const filename = args[1];
 const file = std.open(filename, "r");
 
 if (!file) {
-  std.printf("[BSH] cant open file ");
+  std.printf("[BSH] cant open file %s\n", filename);
   std.exit(1);
 }
 
 const fileContent = file.readAsString();
 file.close();
 
-//storage for variables
+//variables, global and local
 const storage = {};
+const scopes = [] //map for local variables
+let scopeBase = 0
 
+//function for variable lookup
+function lookup(name) {
+  for (let i = scopes.length - 1; i >= scopeBase; i--) {
+    //if local
+    if (scopes[i].has(name)) { return scopes[i].get(name) }
+  }
+  return storage[name]
+}
+
+function scopeFind(name) {
+  for (let i = scopes.length - 1; i >= scopeBase; i--) {
+    if (scopes[i].has(name)) { return scopes[i] }
+  }
+  return null
+}
+
+function setVar(name, value, isLocal) {
+  if (isLocal) {
+    if (scopes.length <= scopeBase) {
+      std.printf("[BSH] no local scope to set variable %s\n", name);
+      std.exit(1);
+    }
+
+    scopes[scopes.length - 1].set(name, value);
+    return;
+  }
+  const s = scopeFind(name);
+  if (s) { s.set(name, value) }
+  else { storage[name] = value }
+}
+
+
+//functions
+const functions = {};
+const functionStack = [];
+
+function parseFnHeader(line) {
+  const m = line.match(/^fn\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*$/);
+  if (!m) { return null }
+  return { name: m[1], params: m[2].split(/[\s,]+/).filter(Boolean) }
+}
+
+function returnFromFn() {
+  const frame = functionStack.pop();
+  scopes.length = frame.scopeDepth;
+  scopeBase = frame.prevBase;
+  index = frame.returnIndex;
+}
 //line parsing
 function parseLine(line) {
   const tokens = [];
@@ -60,7 +110,8 @@ function parseLine(line) {
 function getStrType(token) {
   if (token === undefined) return undefined;
   //if variable found
-  if (storage[token] !== undefined) return storage[token];
+  const v = lookup(token);
+  if (v !== undefined) return v;
   //if variable int
   if (token !== "" && !isNaN(token)) return Number(token);
   //else (as string)
@@ -68,6 +119,44 @@ function getStrType(token) {
 }
 
 const lines = fileContent.split("\n");
+//importing functions from other files
+const mainLength = lines.length;
+const loadedFiles = new Set([filename]);
+
+function dirOf(path) {
+  const i = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+  return i === -1 ? "." : path.slice(0, i)
+}
+
+function addImports(source, basePath) {
+  for (const raw of source) {
+    const t = parseLine(raw);
+    if (t[0] !== "import") continue;
+
+    if (t.length !== 2) {
+      std.printf("[BSH] invalid import syntax ");
+      std.exit(1);
+    }
+
+    const path = dirOf(basePath) + "/" + t[1];
+    if (loadedFiles.has(path)) continue;
+    loadedFiles.add(path);
+
+    const file = std.open(path, "r")
+    if (!file) {
+      std.printf("[BSH] cant open file %s\n", path);
+      std.exit(1);
+    }
+
+    const contentForImport = file.readAsString().split("\n");
+    file.close();
+    addImports(contentForImport, path);
+    lines.push(...contentForImport);
+    loadedFiles.add(path);
+  }
+}
+
+addImports(lines.slice(0, mainLength), filename);
 //parsing for conditions and more in future
 const blocks = {};
 const stack = [];
@@ -84,13 +173,20 @@ for (let i = 0; i < lines.length; i++) {
     continue;
   }
 
-  if (tokens[0] === "if") {
-    stack.push({ ifIndex: i, elseIndex: null })
+  if (tokens[0] === "fn") {
+    const fnHeader = parseFnHeader(line)
+    if (!fnHeader) {
+      std.printf("[BSH] invalid function header on %s\n", i);
+      std.exit(1);
+    }
+    stack.push({ kind: "fn", fnHeader, ifIndex: i, elseIndex: null })
+  } else if (tokens[0] === "if") {
+    stack.push({ kind: "if", ifIndex: i, elseIndex: null })
   } else if (tokens[0] === "else") {
     const current = stack[stack.length - 1]
 
-    if (!current || current.elseIndex !== null) {
-      std.printf("[BSH] unexpected else on %s\n", index);
+    if (!current || current.kind === "fn" || current.elseIndex !== null) {
+      std.printf("[BSH] unexpected else on %s\n", i + 1);
       std.exit(1);
     }
 
@@ -99,8 +195,16 @@ for (let i = 0; i < lines.length; i++) {
     const current = stack.pop()
 
     if (!current) {
-      std.printf("[BSH] unexpected end on %s\n", index);
+      std.printf("[BSH] unexpected end on %s\n", i + 1);
       std.exit(1);
+    }
+
+    if (current.kind === "fn") {
+      functions[current.fnHeader.name] = {
+        params: current.fnHeader.params,
+        startIndex: current.ifIndex,
+        endIndex: i
+      };
     }
 
     blocks[current.ifIndex] = {
@@ -117,12 +221,13 @@ for (let i = 0; i < lines.length; i++) {
 }
 
 if (stack.length > 0) {
-  std.printf("[BSH] invalid syntax on %s\n", stack[stack.length - 1].ifIndex + 1
-);
+  std.printf("[BSH] invalid syntax on %s\n", stack[stack.length - 1].ifIndex + 1);
   std.exit(1);
 }
 
 while (index < lines.length) {
+  if (index >= mainLength && functionStack.length === 0) break;
+
   let line = lines[index].trim();
   if (!line || line.startsWith("--")) {
     index++;
@@ -143,33 +248,34 @@ while (index < lines.length) {
       const toLog = tokens.slice(1).map(getStrType);
       std.printf("%s\n", toLog.join(" "));
       break;
-
-    //variable declaration command
+    //local variable
     case "let":
-      const varName = tokens[1];
-      const operator = tokens[2];
-      const varAction = tokens[3];
+    case "loc":
+      const isLocal = instr === "loc";
+      const locVarName = tokens[1];
+      const locOperator = tokens[2];
+      const locVarAction = tokens[3];
 
-      if (operator !== "=") {
+      if (locOperator !== "=") {
         std.printf("[BSH] invalid syntax on %s\n", index);
         std.exit(1);
       }
 
       //readline method
-      if (varAction === "std.read") {
+      if (locVarAction === "std.read") {
         const toWrite = tokens[4];
-        std.out.puts(getStrType(toWrite));
+        std.out.puts(getStrType(toWrite) ?? "");
         std.out.flush();
         let input = std.in.getline();
-        storage[varName] = input;
-      } else if (varAction === "math.randomInt") {
+        setVar(locVarName, input, isLocal);
+      } else if (locVarAction === "math.randomInt") {
         //generating random int method
         const min = getStrType(tokens[4]);
         const max = getStrType(tokens[5]);
         const result = Math.floor(Math.random() * (max - min + 1)) + min;
 
-        storage[varName] = result;
-      } else if (varAction === "math.calc") {
+        setVar(locVarName, result, isLocal);
+      } else if (locVarAction === "math.calc") {
         //calc method
         const intFirst = getStrType(tokens[4]);
         const operationType = tokens[5];
@@ -177,10 +283,10 @@ while (index < lines.length) {
 
         switch (operationType) {
           case "+":
-            storage[varName] = intFirst + intSecond;
+            setVar(locVarName, intFirst + intSecond, isLocal);
             break;
           case "-":
-            storage[varName] = intFirst - intSecond;
+            setVar(locVarName, intFirst - intSecond, isLocal);
             break;
           case "/":
             if (intSecond === 0) {
@@ -188,34 +294,32 @@ while (index < lines.length) {
               std.exit(1);
             }
 
-            storage[varName] = intFirst / intSecond;
+            setVar(locVarName, intFirst / intSecond, isLocal);
             break;
           case "*":
-            storage[varName] = intFirst * intSecond;
+            setVar(locVarName, intFirst * intSecond, isLocal);
             break;
           default:
             std.printf("[BSH] cant`t found operator %s\n", index);
+            std.exit(1)
             break;
         }
-      } else if (varAction === "math.random") {
+      } else if (locVarAction === "math.random") {
         //random
         const result = Math.random()
 
-        storage[varName] = result;
-      } else if (varAction === "std.getScriptArg") {
+        setVar(locVarName, result, isLocal);
+      } else if (locVarAction === "std.getScriptArg") {
         const num = getStrType(tokens[4]);
         if (args[num] !== undefined && !isNaN(num)) {
-          storage[varName] = args[num];
+          setVar(locVarName, args[num], isLocal);
         } else {
           std.printf("[BSH] invalid argument to method on %s\n", index);
         }
       } else {
-        storage[varName] = getStrType(varAction);
+        setVar(locVarName, getStrType(locVarAction), isLocal);
       }
-
-
       break;
-
     //goto command
     case "goto":
       const lineNumber = getStrType(tokens[1]);
@@ -292,21 +396,78 @@ while (index < lines.length) {
       break;
     }
     case 'end':
-      break;
-    case 'toLowerCase':
-      const valueN = getStrType(tokens[1])
-      if (isNaN(valueN)) {
-        storage[valueN] = valueN?.toLowerCase()
-      } else {
-        std.printf("[BSH] invalid syntax on %s\n", index);
+      const top = functionStack[functionStack.length - 1];
+      if (top && top.endIndex === index) {
+        returnFromFn();
+        jumped = true
       }
       break;
-    case 'toNumber':
-      const valueNum = getStrType(tokens[1])  
-      storage[valueN] = Number(valueNum)
-    default:
-      std.printf("[BSH] unknown syntax on %s\n", index);
+    case 'toLowerCase':
+      const varV = getStrType(tokens[1])
+      const varN = tokens[1]
+      if (typeof varV === 'string') {
+        setVar(varN, varV.toLowerCase(), false)
+      } else {
+        std.printf("[BSH] invalid variable type for toLowerCase on %s\n", index);
+      }
       break;
+    case 'toNumber': {
+      const varNum = getStrType(tokens[1])
+      const varN = tokens[1]
+      setVar(varN, Number(varNum), false)
+      break;
+    }
+    case 'fn':
+      index = blocks[index].endIndex + 1;
+      jumped = true;
+      break;
+    case 'return':
+      if (functionStack.length === 0) {
+        std.printf("[BSH] return statement outside of function on %s\n", index);
+        std.exit(1);
+      }
+
+      returnFromFn();
+      jumped = true;
+      break;
+    case 'import':
+      break;
+    default: {
+      const func = functions[instr];
+      if (!func) {
+        std.printf("[BSH] unknown syntax on %s\n", index);
+        std.exit(1);
+      }
+
+      const argVals = tokens.slice(1).map(getStrType);
+
+      if (argVals.length !== func.params.length) {
+        std.printf("[BSH] incorrect number of arguments for function '%s' on %s\n", instr, index);
+        std.exit(1);
+      }
+
+      if (functionStack.length > 1000) {
+        std.printf("[BSH] stack overflow %s\n", instr);
+        std.exit(1);
+      }
+
+      const frame = new Map();
+      func.params.forEach((p, i) => frame.set(p, argVals[i]));
+
+      functionStack.push({
+        returnIndex: index + 1,
+        endIndex: func.endIndex,
+        saved: argSaved,
+        scopeDepth: scopes.length,
+        prevBase: scopeBase
+      })
+
+      scopes.push(frame);
+      index = func.startIndex + 1;
+      scopeBase = scopes.length - 1;
+      jumped = true;
+    }
+
   }
 
   if (!jumped) {
