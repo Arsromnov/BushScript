@@ -1,0 +1,4 @@
+import "addJS.js"
+
+let a = add 1 2
+log a

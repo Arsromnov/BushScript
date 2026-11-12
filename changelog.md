@@ -1,3 +1,15 @@
+### 0.70 (new release-marking system)
+
+> - core changes
+
+> - add JS modules support
+
+> - bugfix
+
+> - fixed documentation
+
+12.11.2026
+
 ### 0.1.65
 
 > - bugfix
@@ -5,7 +17,9 @@
 ### 0.1.60
 
 > - bugfix
+
 > - added function`s system
+
 > - added local variables
 
 8.11.2026
@@ -22,7 +36,7 @@
 
 > - added toNumber function
 
-4.11.2025
+4.11.2026
 
 ### 0.1.45
 
@@ -45,7 +59,6 @@
 > - added goto command
 
 > - changed variables syntax
-
 
 2.11.2026
 
