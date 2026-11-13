@@ -2,7 +2,9 @@
 >
 >simple programming lang written on QuickJS
 
-![BushScript](src/bsh_logo.ico)
+![BushScript](src/bsh_logo.ico) 
+
+Special thanks to the [TML](https://t.me/TSD_TML_OFFICIAL) for spreading the word and supporting this project. (текст в README)
 
 
 ## wanna start?
