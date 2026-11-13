@@ -4,7 +4,7 @@
 
 ![BushScript](src/bsh_logo.ico) 
 
-Special thanks to the [TML](https://t.me/TSD_TML_OFFICIAL) for spreading the word and supporting this project. (текст в README)
+Special thanks to the [TML](https://t.me/TSD_TML_OFFICIAL) for spreading the word and supporting this project.
 
 
 ## wanna start?
