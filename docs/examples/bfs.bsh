@@ -1,0 +1,4 @@
+import "std/bfs.js"
+
+let x = bfs.readFileAsString str.bsh
+log x

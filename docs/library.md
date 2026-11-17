@@ -33,7 +33,7 @@
 
 2.define the function
 
-`export function default(bsh) { }`
+`export default function(bsh) { }`
 
 3.use bsh api in it
 -->

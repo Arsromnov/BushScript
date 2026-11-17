@@ -47,7 +47,7 @@ export function run() {
                 const isLocal = instr === "loc";
                 const locVarName = tokens[1];
                 const locOperator = tokens[2];
-                const locVarAction = tokens[3];
+                const locVarAction = tokens[3]
 
                 if (locOperator !== "=") {
                     std.printf("[BSH] invalid syntax on %s\n", index);
@@ -55,59 +55,19 @@ export function run() {
                 }
 
                 //readline method
-                if (locVarAction === "std.read") {
+                if (locVarAction === "readLine") {
                     const toWrite = tokens[4];
                     std.out.puts(getStrType(toWrite) ?? "");
                     std.out.flush();
                     let input = std.in.getline();
                     setVar(locVarName, input, isLocal);
-                } else if (locVarAction === "math.randomInt") {
-                    //generating random int method
-                    const min = getStrType(tokens[4]);
-                    const max = getStrType(tokens[5]);
-                    const result = Math.floor(Math.random() * (max - min + 1)) + min;
-
-                    setVar(locVarName, result, isLocal);
-                } else if (locVarAction === "math.calc") {
-                    //calc method
-                    const intFirst = getStrType(tokens[4]);
-                    const operationType = tokens[5];
-                    const intSecond = getStrType(tokens[6]);
-
-                    switch (operationType) {
-                        case "+":
-                            setVar(locVarName, intFirst + intSecond, isLocal);
-                            break;
-                        case "-":
-                            setVar(locVarName, intFirst - intSecond, isLocal);
-                            break;
-                        case "/":
-                            if (intSecond === 0) {
-                                std.printf("[BSH] cant`t divide by zero %s\n", index);
-                                std.exit(1);
-                            }
-
-                            setVar(locVarName, intFirst / intSecond, isLocal);
-                            break;
-                        case "*":
-                            setVar(locVarName, intFirst * intSecond, isLocal);
-                            break;
-                        default:
-                            std.printf("[BSH] cant`t found operator %s\n", index);
-                            std.exit(1)
-                            break;
-                    }
-                } else if (locVarAction === "math.random") {
-                    //random
-                    const result = Math.random()
-
-                    setVar(locVarName, result, isLocal);
-                } else if (locVarAction === "std.getScriptArg") {
+                } else if (locVarAction === "getScriptArg") {
                     const num = getStrType(tokens[4]);
                     if (args[num] !== undefined && !isNaN(num)) {
                         setVar(locVarName, args[num], isLocal);
                     } else {
                         std.printf("[BSH] invalid argument to method on %s\n", index);
+                        std.exit(1);
                     }
                 } else if (methods[locVarAction]) {
                     const methodArgs = tokens.slice(4).map(getStrType);
@@ -123,7 +83,7 @@ export function run() {
                 if (
                     typeof lineNumber !== "number" ||
                     lineNumber > lines.length ||
-                    lineNumber < 0
+                    lineNumber < 1
                 ) {
                     std.printf("[BSH] invalid syntax on %s\n", index);
                     std.exit(1);
@@ -196,15 +156,6 @@ export function run() {
                 if (top && top.endIndex === index) {
                     returnFromFn();
                     jumped = true
-                }
-                break;
-            case 'toLowerCase':
-                const varV = getStrType(tokens[1])
-                const varN = tokens[1]
-                if (typeof varV === 'string') {
-                    setVar(varN, varV.toLowerCase(), false)
-                } else {
-                    std.printf("[BSH] invalid variable type for toLowerCase on %s\n", index);
                 }
                 break;
             case 'toNumber': {

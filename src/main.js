@@ -4,22 +4,22 @@ import { loadImports, buildBlocks } from "./parser.js";
 import { run } from "./instr.js";
 
 /* 
-            BushScript 0.70, released 12.11.26
+            BushScript 0.80, released 17.11.26
                        by arsromnov
                      USES MIT LICENSE!
 */
 
 //structure check
 if (args.length < 2) {
-  std.printf("[BSH] use --> bsh <yourfile.bsh> ");
-  std.exit(0);
+  std.printf("[BSH] use --> bsh <yourfile.bsh> \n");
+  std.exit(1);
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.70, released 12.11.26");
+  console.log("BushScript 0.80, released 17.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
-  std.exit(1);
+  std.exit(0);
 }
 //file
 const filename = args[1];

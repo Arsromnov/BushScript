@@ -14,27 +14,15 @@ loc x = 1
 > declare the local variable x (value: 1)
 
 ```text
-let x = math.calc <num> + <num>
-let x = math.calc 1 + 1
-```
-> math operations
-
-```text
-let x = math.randomInt <minNum> <maxNum>
-let x = math.random 0 1000
-```
-> random
-
-```text
-let x = std.getScriptArg 1
+let x = getScriptArg 1
 ```
 bsh test.bsh --file
 `let x = std.getScriptArg 1` (it be "test.bsh")
 > arguments support
 
 ```text
-let x = std.read <your text>
-let x = std.read "pls write your name"
+let x = readLine <text>
+let x = readLine "pls write your name"
 ```
 > input
 
@@ -85,16 +73,6 @@ exit 0
 <summary>other</summary>
 
 ```text
-toLowerCase <variable>
-toLowerCase x
-
-let x = "STR"
-toLowerCase x
--- x value : str
-```
-> to lowercase function
-
-```text
 let x = std.read()
 -- x = "6"
 toNumber x
@@ -108,6 +86,7 @@ toNumber x
 > comments
 
 </details>
+
 
 <details>
 <summary>functions and imports</summary>
@@ -127,6 +106,65 @@ import "lib/utils.bsh"
 > import fn from other file
 
 </details>
+
+## official modules
+
+<details> 
+<summary>Str-utils</summary>
+
+```import "std/str-utils.js"```
+
+```let x = trim x        --trim method
+   let x = toLower x     --to lowercase method
+   let x = toUpper x     --to uppercase method
+   let x = startsWith x "#"    --method to check starting with char, return true/false
+   let x = endsWith x "#"    --method to check ending with char, return true/false
+   let x = includes x "#"   --method to check includes char, return true/false
+
+
+
+```
+</details>
+
+<details>
+<summary>Math</summary>
+
+```import "std/math.js"```
+
+```text
+let x = math.calc <num> + <num>   --math operations (supported: +  -  /  *)
+let x = math.randomInt <minNum> <maxNum> --generating int
+let x = math.random --random
+```
+> random
+</details>
+
+<details>
+<summary>BushscriptFileSystem (BFS)</summary>
+
+```import "std/bfs.js"```
+
+```text
+
+
+
+let x = bfs.readFileAsString hello.txt     -- x: <file value>
+let x = bfs.cwd     --x: <current dir>
+let x = bfs.realpath <file>  --x: <<file> path>
+
+
+bfs.addToFile "hello world" -- append the value to file
+bfs.writeToFIle "hello world" --changing value of file
+
+bfs.remove "main.txt" --deleting the file/dir(if empty)
+bfs.rename "main.txt" "newName.txt" --renaming the file
+
+
+
+
+```
+</details>
+
 
 ## also check 
 

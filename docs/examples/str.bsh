@@ -1,0 +1,8 @@
+import "std/str-utils.js"
+
+let x = "hello" 
+
+let x = toUpper x
+
+log x
+log "x"

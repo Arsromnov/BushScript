@@ -1,15 +1,18 @@
+import "std/math.js"
+import "std/str-utils.js"
+
 let random = math.randomInt 1 100
-let user = std.read "your num>"
+let user = readLine "your num>"
 
 
 if user == random
     log "win!" user "==" random
-    let more = std.read "try hard mode? (y/n) >"
-    toLowerCase more
+    let more = readLine "try hard mode? (y/n) >"
+    let more = toLower more
     log more
     if more == y 
         let randomH = math.randomInt 1 100
-        let userH = std.read "your num>"
+        let userH = readLine "your num>"
 
         if userH == randomH
             log "<:

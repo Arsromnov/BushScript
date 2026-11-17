@@ -13,16 +13,16 @@ export const state = {
 }
 
 //variables, global and local
-export const storage = {};
+export const storage = Object.create(null);;
 export const scopes = [] //map for local variables
 
 //functions and blocks
-export const functions = {};
+export const functions = Object.create(null);;
 export const blocks = {};
 
 //commands and methods from JS
-export const commands = {};
-export const methods = {};
+export const commands = Object.create(null);;
+export const methods = Object.create(null);;
 
 export function regCommand(name, fn) {
   commands[name] = fn;
@@ -76,6 +76,8 @@ export function getStrType(token) {
   if (v !== undefined) return v;
   //if variable int
   if (token !== "" && !isNaN(token)) return Number(token);
+  //if in ""
+  if (token.length >= 2 && token.startsWith('"') && token.endsWith('"')) return token.slice(1, -1);
   //else (as string)
   return token;
 }

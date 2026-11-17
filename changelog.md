@@ -1,3 +1,17 @@
+### 0.80
+
+> - added filesystem module
+
+> - added str-utils module
+
+> - changes in math module
+
+> - change syntax(see docs)
+
+> - bugfix
+
+17.11.2026
+
 ### 0.70 (new release-marking system)
 
 > - core changes
