@@ -1,3 +1,21 @@
+### 0.90
+
+> - added while loop
+
+> - added json module
+
+> - added new logo
+
+> - change BushFileSystem module
+
+> - added increments
+
+> - core changes
+
+> - bugfix
+
+22.11.2026
+
 ### 0.80
 
 > - added filesystem module

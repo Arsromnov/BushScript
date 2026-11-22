@@ -2,7 +2,7 @@ import * as std from "qjs:std";
 import * as os from "qjs:os";
 import {
     args, lines, state, scopes, functions, blocks,
-    setVar, getStrType, commands, methods
+    setVar, getStrType, commands, methods, lookup
 } from "./state.js";
 import { parseLine } from "./parser.js";
 
@@ -34,7 +34,28 @@ export function run() {
         }
 
         const instr = tokens[0];
+
         let jumped = false;
+
+        function evalCondition() {
+            const leftVal = getStrType(tokens[1])
+            const op = tokens[2]
+            const rightVal = getStrType(tokens[3])
+
+            let conditionMet = false
+
+            switch (op) {
+                case '==': return leftVal == rightVal;
+                case '!=': return leftVal != rightVal;
+                case '<=': return leftVal <= rightVal;
+                case '>=': return leftVal >= rightVal;
+                case '<': return leftVal < rightVal;
+                case '>': return leftVal > rightVal;
+                default:
+                    std.printf("[BSH] invalid operator on %s\n", index);
+                    std.exit(1);
+            }
+        }
 
         switch (instr) {
             case "log":
@@ -69,6 +90,12 @@ export function run() {
                         std.printf("[BSH] invalid argument to method on %s\n", index);
                         std.exit(1);
                     }
+                } else if (locVarAction === "time.currentISO") {
+                    const result = new Date().toISOString();
+                    setVar(locVarName, result, isLocal)
+                } else if (locVarAction === "time.currentUNIX") {
+                    const result = Date.now();
+                    setVar(locVarName, result, isLocal)
                 } else if (methods[locVarAction]) {
                     const methodArgs = tokens.slice(4).map(getStrType);
                     setVar(locVarName, methods[locVarAction](...methodArgs), isLocal);
@@ -106,24 +133,6 @@ export function run() {
 
             //if/else conditions
             case 'if':
-                const leftVal = getStrType(tokens[1])
-                const op = tokens[2]
-                const rightVal = getStrType(tokens[3])
-
-                let conditionMet = false
-
-                switch (op) {
-                    case '==': conditionMet = (leftVal == rightVal); break;
-                    case '!=': conditionMet = (leftVal != rightVal); break;
-                    case '<=': conditionMet = (leftVal <= rightVal); break;
-                    case '>=': conditionMet = (leftVal >= rightVal); break;
-                    case '<': conditionMet = (leftVal < rightVal); break;
-                    case '>': conditionMet = (leftVal > rightVal); break;
-                    default:
-                        std.printf("[BSH] invalid operator on %s\n", index);
-                        std.exit(1);
-                }
-
                 const block = blocks[index]
 
                 if (!block) {
@@ -131,7 +140,7 @@ export function run() {
                     std.exit(1);
                 }
 
-                if (!conditionMet) {
+                if (!evalCondition(tokens)) {
                     index = block.elseIndex !== null
                         ? block.elseIndex + 1
                         : block.endIndex + 1;
@@ -151,11 +160,31 @@ export function run() {
                 jumped = true;
                 break;
             }
+            case 'while': {
+                const block = blocks[index]
+
+                if (!block) {
+                    std.printf("[BSH] invalid condition syntax on %s\n", index);
+                    std.exit(1);
+                }
+
+                if (!evalCondition(tokens)) {
+                    index = block.endIndex + 1
+                    jumped = true
+                }
+
+                break;
+            }
             case 'end':
                 const top = functionStack[functionStack.length - 1];
+                const blk = blocks[index];
+
                 if (top && top.endIndex === index) {
                     returnFromFn();
-                    jumped = true
+                    jumped = true;
+                } else if (blk && blk.whileIndex !== undefined) {
+                    index = blk.whileIndex;
+                    jumped = true;
                 }
                 break;
             case 'toNumber': {
@@ -180,6 +209,13 @@ export function run() {
             case 'import':
                 break;
             default: {
+                if (instr.endsWith("--") || instr.endsWith("++")) {
+                    const name = instr.slice(0, -2);
+                    const cur = lookup(name)
+                    setVar(name, instr.endsWith("++") ? cur + 1 : cur - 1, false);
+                    break;
+                }
+
                 const cmd = commands[instr];
                 if (cmd) {
                     cmd(...tokens.slice(1).map(getStrType));

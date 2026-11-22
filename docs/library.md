@@ -19,7 +19,7 @@
 
 3. include the library files in your code
 
-4. run use 'bsh yourcode.bsh --jsAllow'
+4. run use 'bsh yourcode.bsh'
 
 ## 2. how to create
 
@@ -37,13 +37,14 @@
 
 3.use bsh api in it
 -->
-    `bsh.setVar(name,value,IsLocal?) --add variable`
-    --
-    `bsh.getStrValue(token) --return stroke type (variable,number,string)`
-    --
-    `bsh.regMethod(fn,value => <for returning>)`
-    --
-    `bsh.regMethod(fn,value => <task>)`
+
+`setVar(name,value,IsLocal?) --add variable`
+    
+`getStrValue(token) --return stroke type (variable,number,string)`
+
+`bsh.regMethod(fn,value => <for returning>)`
+    
+`bsh.regMethod(fn,value => <task>)`
 
 4.import and use
 

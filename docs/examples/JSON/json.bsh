@@ -1,0 +1,13 @@
+import "std/json.js"
+import "std/bfs.js"
+
+let content = json.GetParam "test.json" "content"
+let name = json.GetParam "test.json" "fileToCreate"
+
+if name == "hello world"
+    log "aaaaaaaa"
+    goto 6
+else 
+    bfs.addToFile name content
+end
+

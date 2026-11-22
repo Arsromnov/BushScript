@@ -17,7 +17,7 @@ loc x = 1
 let x = getScriptArg 1
 ```
 bsh test.bsh --file
-`let x = std.getScriptArg 1` (it be "test.bsh")
+`let x = getScriptArg 1` (it be "test.bsh")
 > arguments support
 
 ```text
@@ -53,6 +53,13 @@ goto 1
 > goto
 
 ```text
+while <condition>
+  log "true!"
+end
+```
+> while loop
+
+```text
 if <condition>
   log "true"
 else
@@ -73,7 +80,7 @@ exit 0
 <summary>other</summary>
 
 ```text
-let x = std.read()
+let x = readLine "write here some text"
 -- x = "6"
 toNumber x
 -- x = 6
@@ -81,9 +88,22 @@ toNumber x
 > to number function
 
 ```text
+let x = time.currentISO --return current ISO time
+let x = time.currentUNIX --return current UNIX time
+```
+
+> time functions
+
+```text
 --comment
 ```
 > comments
+
+```text
+x++     +1
+x--     -1
+```
+> increments (only on global variables)
 
 </details>
 
@@ -94,7 +114,7 @@ toNumber x
 ```text
 fn <name>(<param>,<param>)
   <source>
-  return
+  return <value for return>   --if have value for returning, can be used as method
 end --can be used as return
 ```
 > function
@@ -114,15 +134,13 @@ import "lib/utils.bsh"
 
 ```import "std/str-utils.js"```
 
-```let x = trim x        --trim method
+```text
+   let x = trim x        --trim method
    let x = toLower x     --to lowercase method
    let x = toUpper x     --to uppercase method
    let x = startsWith x "#"    --method to check starting with char, return true/false
    let x = endsWith x "#"    --method to check ending with char, return true/false
    let x = includes x "#"   --method to check includes char, return true/false
-
-
-
 ```
 </details>
 
@@ -148,13 +166,13 @@ let x = math.random --random
 
 
 
-let x = bfs.readFileAsString hello.txt     -- x: <file value>
+let x = bfs.readFile hello.txt     -- x: <file value>
 let x = bfs.cwd     --x: <current dir>
 let x = bfs.realpath <file>  --x: <<file> path>
 
 
-bfs.addToFile "hello world" -- append the value to file
-bfs.writeToFIle "hello world" --changing value of file
+bfs.append "hello world" -- append the value to file
+bfs.write "hello world" --changing value of file
 
 bfs.remove "main.txt" --deleting the file/dir(if empty)
 bfs.rename "main.txt" "newName.txt" --renaming the file

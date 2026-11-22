@@ -12,13 +12,13 @@ async function loadJS(path, builtin) {
 
   try {
     if (builtin) {
-      try { mod = await import(path)}
+      try { mod = await import(path) }
       catch (_) { mod = await import(absPath(path)); }
     } else {
       mod = await import(absPath(path));
     }
   } catch (e) {
-    std.printf("[BSH] error importing %s: %s\n", abs, e.message);
+    std.printf("[BSH] error importing %s: %s\n", path, e.message);
     std.exit(1);
   }
 
@@ -83,7 +83,7 @@ export async function addImports(source, basePath) {
 
     const file = std.open(path, "r")
     if (!file) {
-      std.printf("[BSH] cant open file %s\n", path);
+      std.printf("[BSH] cant open file for import  %s\n", path);
       std.exit(1);
     }
 
@@ -124,10 +124,12 @@ export function buildBlocks() {
       stack.push({ kind: "fn", fnHeader, ifIndex: i, elseIndex: null })
     } else if (tokens[0] === "if") {
       stack.push({ kind: "if", ifIndex: i, elseIndex: null })
+    } else if (tokens[0] === "while") {
+      stack.push({ kind: "while", ifIndex: i, elseIndex: null })
     } else if (tokens[0] === "else") {
       const current = stack[stack.length - 1]
 
-      if (!current || current.kind === "fn" || current.elseIndex !== null) {
+      if (!current || current.kind !== "if" || current.elseIndex !== null) {
         std.printf("[BSH] unexpected else on %s\n", i + 1);
         std.exit(1);
       }
@@ -147,6 +149,10 @@ export function buildBlocks() {
           startIndex: current.ifIndex,
           endIndex: i
         };
+      }
+
+      if (current.kind === "while") {
+        blocks[i] = { whileIndex: current.ifIndex }
       }
 
       blocks[current.ifIndex] = {

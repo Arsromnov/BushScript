@@ -4,7 +4,7 @@ import { loadImports, buildBlocks } from "./parser.js";
 import { run } from "./instr.js";
 
 /* 
-            BushScript 0.80, released 17.11.26
+            BushScript 0.90, released 22.11.26
                        by arsromnov
                      USES MIT LICENSE!
 */
@@ -16,7 +16,7 @@ if (args.length < 2) {
 }
 //flags
 if (args[1] === "--version") {
-  console.log("BushScript 0.80, released 17.11.26");
+  console.log("BushScript 0.90, released 22.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
   std.exit(0);

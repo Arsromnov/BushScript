@@ -2,7 +2,7 @@ import * as std from "qjs:std";
 import * as os from "qjs:os";
 
 export default function (bsh) {
-    bsh.regMethod("bfs.readFileAsString", (filename) => {
+    bsh.regMethod("bfs.readFile", (filename) => {
         const f = std.open(filename, 'r')
         if (!f) {
             std.printf("[BSH] bfs error -> cant open file");
@@ -15,7 +15,7 @@ export default function (bsh) {
     bsh.regMethod("bfs.cwd", () => os.getcwd()[0]);
     bsh.regMethod("bfs.realpath", (p) => os.realpath(p)[0]);
 
-    bsh.regCommand("bfs.addToFile", (filename, content) => {
+    bsh.regCommand("bfs.append", (filename, content) => {
         const f = std.open(filename, "a");
         if (!f) {
             std.printf("[BSH] bfs error -> cant open file");
@@ -24,7 +24,7 @@ export default function (bsh) {
         f.puts(content);
         f.close();
     })
-    bsh.regCommand("bfs.writeToFile", (filename, content) => {
+    bsh.regCommand("bfs.write", (filename, content) => {
         const f = std.open(filename, "w");
         if (!f) {
             std.printf("[BSH] bfs error -> cant open file");

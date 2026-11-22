@@ -1,8 +1,6 @@
-# welcome to bushscript repository!
->
->simple programming lang written on QuickJS
-
+# BushScript
 ![BushScript](src/bsh_logo.ico) 
+
 
 Special thanks to the [TML](https://t.me/TSD_TML_OFFICIAL) for spreading the word and supporting this project.
 
@@ -12,6 +10,7 @@ Special thanks to the [TML](https://t.me/TSD_TML_OFFICIAL) for spreading the wor
 docs welcome-page [here](docs/index.md)
 
 see syntax [here](docs/basics.md)
+
 see guide for library`s [here](docs/library.md)
 
 examples [here](docs/examples/)

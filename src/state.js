@@ -8,8 +8,8 @@ export const lines = []
 
 
 export const state = {
-    scopeBase: 0,
-    mainLength: 0,
+  scopeBase: 0,
+  mainLength: 0,
 }
 
 //variables, global and local
@@ -81,3 +81,4 @@ export function getStrType(token) {
   //else (as string)
   return token;
 }
+
