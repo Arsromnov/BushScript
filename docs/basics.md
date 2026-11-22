@@ -1,7 +1,7 @@
 # basics of BushScript
 
-<details>
-<summary>variables and methods</summary>
+<details markdown="1">
+<summary markdown="span">variables and methods</summary>
 
 ```text
 let x = 1
@@ -28,8 +28,8 @@ let x = readLine "pls write your name"
 
 </details>
 
-<details>
-<summary>log</summary>
+<details markdown="1">
+<summary markdown="span">log</summary>
 
 ```text
 log "some text"
@@ -43,8 +43,8 @@ log "hello" x
 
 </details>
 
-<details>
-<summary>operators</summary>
+<details markdown="1">
+<summary markdown="span">operators</summary>
 
 ```text
 goto <line number>
@@ -76,8 +76,8 @@ exit 0
 
 </details>
 
-<details>
-<summary>other</summary>
+<details markdown="1">
+<summary markdown="span">other</summary>
 
 ```text
 let x = readLine "write here some text"
@@ -108,8 +108,8 @@ x--     -1
 </details>
 
 
-<details>
-<summary>functions and imports</summary>
+<details markdown="1">
+<summary markdown="span">functions and imports</summary>
 
 ```text
 fn <name>(<param>,<param>)
@@ -130,7 +130,7 @@ import "lib/utils.bsh"
 ## official modules
 
 <details> 
-<summary>Str-utils</summary>
+<summary markdown="span">Str-utils</summary>
 
 ```import "std/str-utils.js"```
 
@@ -144,8 +144,8 @@ import "lib/utils.bsh"
 ```
 </details>
 
-<details>
-<summary>Math</summary>
+<details markdown="1">
+<summary markdown="span">Math</summary>
 
 ```import "std/math.js"```
 
@@ -157,8 +157,8 @@ let x = math.random --random
 > random
 </details>
 
-<details>
-<summary>BushscriptFileSystem (BFS)</summary>
+<details markdown="1">
+<summary markdown="span">BushscriptFileSystem (BFS)</summary>
 
 ```import "std/bfs.js"```
 
