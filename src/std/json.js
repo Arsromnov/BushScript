@@ -1,4 +1,4 @@
-import * as std from 'std';
+import * as std from 'qjs:std';
 
 export default function (bsh) {
     bsh.regMethod("json.GetParam", (file, param) => {

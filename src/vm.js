@@ -1,10 +1,13 @@
 import * as std from "qjs:std";
-import { args, lines, state } from "./state.js";
-import { loadImports, buildBlocks } from "./parser.js";
+import { Context } from "./state.js";
+import { loadImports } from "./compiler/imports.js";
+import { buildBlocks } from "./compiler/blocks.js";
 import { run } from "./instr.js";
 
 export class VM {
   async run(filename) {
+    const ctx = new Context();
+
     const file = std.open(filename, "r");
     if (!file) {
       std.printf("[BSH] cant open file %s\n", filename);
@@ -14,11 +17,11 @@ export class VM {
     const fileContent = file.readAsString();
     file.close();
 
-    lines.push(...fileContent.split("\n"));
-    state.mainLength = lines.length;
+    ctx.lines.push(...fileContent.split("\n"));
+    ctx.state.mainLength = ctx.lines.length;
 
-    await loadImports(filename);
-    buildBlocks();
-    run();
+    await loadImports(ctx, filename);
+    buildBlocks(ctx);
+    run(ctx);
   }
 }
