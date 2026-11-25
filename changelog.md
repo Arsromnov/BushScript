@@ -1,3 +1,7 @@
+### 0.95
+
+> - core optimization
+
 ### 0.90
 
 > - added while loop

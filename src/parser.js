@@ -44,6 +44,8 @@ export function parseLine(line) {
   return tokens;
 }
 
+export const parsedLines = [];
+
 export function parseFnHeader(line) {
   const m = line.match(/^fn\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*$/);
   if (!m) { return null }
@@ -103,14 +105,19 @@ export async function loadImports(filename) {
 export function buildBlocks() {
   const stack = [];
 
+  parsedLines.length = 0;
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim()
 
     if (!line || line.startsWith("--")) {
+      parsedLines[i] = [];
       continue;
     }
 
     const tokens = parseLine(line)
+    parsedLines[i] = tokens
+
     if (tokens.length === 0) {
       continue;
     }

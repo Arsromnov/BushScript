@@ -4,7 +4,7 @@ import {
     args, lines, state, scopes, functions, blocks,
     setVar, getStrType, commands, methods, lookup
 } from "./state.js";
-import { parseLine } from "./parser.js";
+import { parsedLines } from "./parser.js";
 
 
 let index = 0;
@@ -27,7 +27,7 @@ export function run() {
             continue;
         }
 
-        const tokens = parseLine(line);
+        const tokens = parsedLines[index];
         if (tokens.length === 0) {
             index++;
             continue;
@@ -41,8 +41,6 @@ export function run() {
             const leftVal = getStrType(tokens[1])
             const op = tokens[2]
             const rightVal = getStrType(tokens[3])
-
-            let conditionMet = false
 
             switch (op) {
                 case '==': return leftVal == rightVal;
