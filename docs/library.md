@@ -1,59 +1,53 @@
-# library in bushscript
+# Creating libraries
 
+You can write BushScript libraries in either `.bsh` (BushScript) or `.js`
+(JavaScript, extending the language with new methods and commands).
 
-## 1. how to install?
+## BushScript libraries
 
-### if library written in bushscript
+1. Create a folder (e.g. `lib/`) and place your `.bsh` files in it.
+2. Define functions in the file — they can then be imported.
+3. Import them in your code:
 
-1. create a 'lib' folder(other name`s supported)
+   ```text
+   import "lib/utils.bsh"
+   ```
 
-2. place the library files into the created directory
+## JavaScript libraries
 
-3. include the library files in your code
+1. Create a `.js` file (e.g. `lib/myutils.js`).
+2. Export a default function that receives the `bsh` API:
 
-### if library written in javascript
+   ```js
+   export default function(bsh) {
+     bsh.regMethod("myMethod", (arg) => {
+       return arg.toUpperCase();
+     });
 
-1. create a 'lib' folder(other name supported)
+     bsh.regCommand("myCommand", (arg) => {
+       bsh.setVar(arg, "done", false);
+     });
+   }
+   ```
 
-2. place the library files into the created directory
+3. Import and use it:
 
-3. include the library files in your code
+   ```text
+   import "lib/myutils.js"
+   let x = myMethod "hello"
+   ```
 
-4. run use 'bsh yourcode.bsh'
+## The `bsh` API
 
-## 2. how to create
+Available to JavaScript libraries:
 
-### if you use bushscript
+| Method | Description |
+|--------|-------------|
+| `bsh.regMethod(name, fn)` | Register a method that returns a value (usable in `let x = ...`) |
+| `bsh.regCommand(name, fn)` | Register a command (usable as a statement) |
+| `bsh.setVar(name, value, isLocal)` | Set a variable (global or local) |
+| `bsh.lookup(name)` | Look up a variable's value |
+| `bsh.getStrType(token)` | Resolve a token to its value (variable, number, or string) |
+| `bsh.args` | Script arguments |
 
-1.Just create functions in the file; they can then be imported.
-
-### if you use javascript
-
-1.create a '.js' file 
-
-2.define the function
-
-`export default function(bsh) { }`
-
-3.use bsh api in it
--->
-
-`setVar(name,value,IsLocal?) --add variable`
-    
-`getStrValue(token) --return stroke type (variable,number,string)`
-
-`bsh.regMethod(fn,value => <for returning>)`
-    
-`bsh.regMethod(fn,value => <task>)`
-
-4.import and use
-
-### examples
-
-[addJS module](js/addJs.js)
-
-### also check
-
-[basics](basics.md)
-
-
+See the std modules (`src/std/`) for working examples.
