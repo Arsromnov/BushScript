@@ -1,8 +1,7 @@
 import * as std from "qjs:std";
 import { args } from "./state.js";
 import { Context } from "./state.js";
-import { loadImports } from "./compiler.js";
-import { buildBlocks } from "./compiler.js";
+import { loadImports, compile, buildBlocks } from "./compiler.js";
 import { run } from "./instr.js";
 
 // ---------- CLI ----------
@@ -59,6 +58,7 @@ class VM {
 
     await loadImports(ctx, filename);
     buildBlocks(ctx);
+    compile(ctx);
     run(ctx);
   }
 }

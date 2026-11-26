@@ -1,6 +1,5 @@
 import * as std from "qjs:std";
 import * as os from "qjs:os";
-import { parseLine } from "./compiler.js";
 
 // Tree-walk interpreter over compiled jump tables.
 // Receives a Context; no module-level mutable state leaks out.
@@ -36,13 +35,13 @@ export function run(ctx) {
     while (index < ctx.lines.length) {
         if (index >= ctx.state.mainLength && functionStack.length === 0) break;
 
-        let line = ctx.lines[index].trim();
-        if (!line || line.startsWith("--")) {
+        const entry = ctx.compiled[index];
+        if (!entry) {
             index++;
             continue;
         }
 
-        const tokens = parseLine(line);
+        const tokens = entry.tokens;
         if (tokens.length === 0) {
             index++;
             continue;

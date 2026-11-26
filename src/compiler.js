@@ -172,3 +172,21 @@ export function buildBlocks(ctx) {
     std.exit(1);
   }
 }
+
+// Pre-tokenize every source line once at compile time.
+// The interpreter no longer trims or re-tokenizes on each iteration.
+// Each entry is either null (skip) or { tokens: string[] }.
+export function compile(ctx) {
+  ctx.compiled = new Array(ctx.lines.length);
+
+  for (let i = 0; i < ctx.lines.length; i++) {
+    const line = ctx.lines[i].trim();
+
+    if (!line || line.startsWith("--")) {
+      ctx.compiled[i] = null;
+      continue;
+    }
+
+    ctx.compiled[i] = { tokens: parseLine(line) };
+  }
+}
