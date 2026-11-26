@@ -1,6 +1,6 @@
 import * as std from "qjs:std";
 import * as os from "qjs:os";
-import { parseLine } from "./compiler/tokenizer.js";
+import { parseLine } from "./compiler.js";
 
 // Tree-walk interpreter over compiled jump tables.
 // Receives a Context; no module-level mutable state leaks out.

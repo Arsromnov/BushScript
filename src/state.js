@@ -1,10 +1,13 @@
 import * as std from 'qjs:std';
 
+//arguments (module-level for CLI parsing)
+export const args = typeof scriptArgs !== 'undefined' ? scriptArgs : [];
+
 // Encapsulates all mutable program state instead of module-level globals.
 // One Context per VM run; nothing leaks between runs.
 export class Context {
   constructor() {
-    this.args = typeof scriptArgs !== 'undefined' ? scriptArgs : [];
+    this.args = args;
     this.lines = [];
     this.state = { scopeBase: 0, mainLength: 0 };
     this.storage = Object.create(null);
