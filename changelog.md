@@ -1,8 +1,16 @@
 ### 0.95 
 
+thx to @oversouth for his contribution to the development
+
 > - core optimization
+
 > - functions can now return values ​​and be used as methods
+
 > - minor changes
+
+> - documentation rewrite
+
+> - add build script for linux
 
 ### 0.90
 

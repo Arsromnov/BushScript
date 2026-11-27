@@ -14,17 +14,16 @@ Flags:
 
 ```bash
 bsh --version   # show version
-bsh --help      # show help
 ```
 
 ## Documentation
 
-- [Basics / syntax](./basics.html) — variables, log, if/else, while, goto, functions, imports
-- [Modules](./modules/math.html) — stdlib reference (math, str-utils, json, bfs)
-- [Creating libraries](./library.html) — how to write `.bsh` and `.js` libraries
-- [Packaging](./packaging.html) — how builds and packages are produced
-- [Contributing](./contributing.html) — how to submit fixes and modules
+- [Basics / syntax](./basics.md) — variables, log, if/else, while, goto, functions, imports
+- [Modules](./modules/math.md) — stdlib reference (math, str-utils, json, bfs)
+- [Creating libraries](./library.md) — how to write `.bsh` and `.js` libraries
+- [Packaging](./packaging.md) — how builds and packages are produced
+- [Contributing](./contributing.md) — how to submit fixes and modules
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](../LICENSE)

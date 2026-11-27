@@ -45,9 +45,8 @@ Available to JavaScript libraries:
 |--------|-------------|
 | `bsh.regMethod(name, fn)` | Register a method that returns a value (usable in `let x = ...`) |
 | `bsh.regCommand(name, fn)` | Register a command (usable as a statement) |
-| `bsh.setVar(name, value, isLocal)` | Set a variable (global or local) |
-| `bsh.lookup(name)` | Look up a variable's value |
-| `bsh.getStrType(token)` | Resolve a token to its value (variable, number, or string) |
-| `bsh.args` | Script arguments |
+| `setVar(name, value, isLocal)` | Set a variable (global or local) |
+| `lookup(name)` | Look up a variable's value |
+| `getStrType(token)` | Resolve a token to its value (variable, number, or string) |
 
 See the std modules (`src/std/`) for working examples.
