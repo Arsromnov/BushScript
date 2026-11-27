@@ -125,7 +125,7 @@ export function buildBlocks() {
     if (tokens[0] === "fn") {
       const fnHeader = parseFnHeader(line)
       if (!fnHeader) {
-        std.printf("[BSH] invalid function header on %s\n", i);
+        std.printf("[BSH] invalid function header on %s\n", i + 1);
         std.exit(1);
       }
       stack.push({ kind: "fn", fnHeader, ifIndex: i, elseIndex: null })

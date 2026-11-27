@@ -1,6 +1,8 @@
-### 0.95
+### 0.95 
 
 > - core optimization
+> - functions can now return values ​​and be used as methods
+> - minor changes
 
 ### 0.90
 

@@ -10,25 +10,70 @@ import { parsedLines } from "./parser.js";
 let index = 0;
 const functionStack = [];
 
-function returnFromFn() {
+function callFn(name, argTokens, retVar = null, retIsLocal = false) {
+    const func = functions[name]
+    const argVals = argTokens.map(getStrType);
+
+    if (argVals.length !== func.params.length) {
+        std.printf("[BSH] incorrect number of arguments for function '%s' on %s\n", name, index);
+        std.exit(1);
+    }
+
+    if (functionStack.length > 1000) {
+        std.printf("[BSH] stack overflow %s\n", name);
+        std.exit(1);
+    }
+
+    const frame = new Map();
+    func.params.forEach((p, i) => frame.set(p, argVals[i]));
+
+    functionStack.push({
+        returnIndex: index + 1,
+        endIndex: func.endIndex,
+        scopeDepth: scopes.length,
+        prevBase: state.scopeBase,
+        retVar,
+        retIsLocal
+    })
+
+    scopes.push(frame);
+    state.scopeBase = scopes.length - 1;
+    index = func.startIndex + 1;
+}
+
+function returnFromFn(value) {
     const frame = functionStack.pop();
     scopes.length = frame.scopeDepth;
     state.scopeBase = frame.prevBase;
     index = frame.returnIndex;
+
+    if (frame.retVar !== null) {
+        setVar(frame.retVar, value ?? "", frame.retIsLocal)
+    }
+}
+
+function evalCondition(tokens, index) {
+    const leftVal = getStrType(tokens[1])
+    const op = tokens[2]
+    const rightVal = getStrType(tokens[3])
+
+    switch (op) {
+        case '==': return leftVal == rightVal;
+        case '!=': return leftVal != rightVal;
+        case '<=': return leftVal <= rightVal;
+        case '>=': return leftVal >= rightVal;
+        case '<': return leftVal < rightVal;
+        case '>': return leftVal > rightVal;
+        default:
+            std.printf("[BSH] invalid operator on %s\n", index);
+            std.exit(1);
+    }
 }
 
 export function run() {
     while (index < lines.length) {
-        if (index >= state.mainLength && functionStack.length === 0) break;
-
-        let line = lines[index].trim();
-        if (!line || line.startsWith("--")) {
-            index++;
-            continue;
-        }
-
         const tokens = parsedLines[index];
-        if (tokens.length === 0) {
+        if (!tokens || tokens.length === 0) {
             index++;
             continue;
         }
@@ -36,24 +81,6 @@ export function run() {
         const instr = tokens[0];
 
         let jumped = false;
-
-        function evalCondition() {
-            const leftVal = getStrType(tokens[1])
-            const op = tokens[2]
-            const rightVal = getStrType(tokens[3])
-
-            switch (op) {
-                case '==': return leftVal == rightVal;
-                case '!=': return leftVal != rightVal;
-                case '<=': return leftVal <= rightVal;
-                case '>=': return leftVal >= rightVal;
-                case '<': return leftVal < rightVal;
-                case '>': return leftVal > rightVal;
-                default:
-                    std.printf("[BSH] invalid operator on %s\n", index);
-                    std.exit(1);
-            }
-        }
 
         switch (instr) {
             case "log":
@@ -95,8 +122,12 @@ export function run() {
                     const result = Date.now();
                     setVar(locVarName, result, isLocal)
                 } else if (methods[locVarAction]) {
+                    //methods support
                     const methodArgs = tokens.slice(4).map(getStrType);
                     setVar(locVarName, methods[locVarAction](...methodArgs), isLocal);
+                } else if (functions[locVarAction]) {
+                    callFn(locVarAction, tokens.slice(4), locVarName, isLocal);
+                    jumped = true;
                 } else {
                     setVar(locVarName, getStrType(locVarAction), isLocal);
                 }
@@ -138,7 +169,7 @@ export function run() {
                     std.exit(1);
                 }
 
-                if (!evalCondition(tokens)) {
+                if (!evalCondition(tokens, index)) {
                     index = block.elseIndex !== null
                         ? block.elseIndex + 1
                         : block.endIndex + 1;
@@ -166,7 +197,7 @@ export function run() {
                     std.exit(1);
                 }
 
-                if (!evalCondition(tokens)) {
+                if (!evalCondition(tokens, index)) {
                     index = block.endIndex + 1
                     jumped = true
                 }
@@ -201,7 +232,8 @@ export function run() {
                     std.exit(1);
                 }
 
-                returnFromFn();
+                const retVal = tokens.length > 1 ? getStrType(tokens[1]) : undefined;
+                returnFromFn(retVal);
                 jumped = true;
                 break;
             case 'import':
@@ -220,37 +252,13 @@ export function run() {
                     break;
                 }
 
+
                 const func = functions[instr];
                 if (!func) {
-                    std.printf("[BSH] unknown syntax on %s\n", index);
+                    std.printf("[BSH] unknown syntax on %s\n", index + 1);
                     std.exit(1);
                 }
-
-                const argVals = tokens.slice(1).map(getStrType);
-
-                if (argVals.length !== func.params.length) {
-                    std.printf("[BSH] incorrect number of arguments for function '%s' on %s\n", instr, index);
-                    std.exit(1);
-                }
-
-                if (functionStack.length > 1000) {
-                    std.printf("[BSH] stack overflow %s\n", instr);
-                    std.exit(1);
-                }
-
-                const frame = new Map();
-                func.params.forEach((p, i) => frame.set(p, argVals[i]));
-
-                functionStack.push({
-                    returnIndex: index + 1,
-                    endIndex: func.endIndex,
-                    scopeDepth: scopes.length,
-                    prevBase: state.scopeBase
-                })
-
-                scopes.push(frame);
-                index = func.startIndex + 1;
-                state.scopeBase = scopes.length - 1;
+                callFn(instr, tokens.slice(1))
                 jumped = true;
             }
 
