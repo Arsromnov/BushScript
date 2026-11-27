@@ -3,7 +3,9 @@ description: A simple scripting language
 url: https://arsromnov.github.io
 baseurl: /BushScript
 
-remote_theme: pmarsceill/just-the-docs
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-remote-theme
 color_scheme: dark
 
 aux_links:
@@ -65,4 +67,3 @@ defaults:
       type: pages
     values:
       layout: default
-      permalink: /:title.html
