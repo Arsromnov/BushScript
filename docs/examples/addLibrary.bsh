@@ -1,4 +1,9 @@
+import "std/math.js"
+
 fn add(a,b)
     let result = math.calc a + b
-    log result
+    return result
 end    
+
+let x = add 10 20
+log x

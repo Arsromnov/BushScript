@@ -11,7 +11,7 @@ function printUsage() {
 }
 
 function printVersion() {
-  console.log("BushScript 0.95");
+  console.log("BushScript 0.95, released 27.11.26");
   console.log("      developed by arsromnov       ");
   console.log("        USES MIT LICENSE!          ");
 }

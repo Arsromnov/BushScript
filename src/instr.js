@@ -7,11 +7,46 @@ export function run(ctx) {
     let index = 0;
     const functionStack = [];
 
-    function returnFromFn() {
+    function returnFromFn(value) {
         const frame = functionStack.pop();
         ctx.scopes.length = frame.scopeDepth;
         ctx.state.scopeBase = frame.prevBase;
         index = frame.returnIndex;
+
+        if (frame.retVar !== null) {
+            ctx.setVar(frame.retVar, value ?? "", frame.retIsLocal);
+        }
+    }
+
+    function callFn(name, argTokens, retVar = null, retIsLocal = false) {
+        const func = ctx.functions[name];
+        const argVals = argTokens.map(t => ctx.getStrType(t));
+
+        if (argVals.length !== func.params.length) {
+            std.printf("[BSH] incorrect number of arguments for function '%s' on %s\n", name, index);
+            std.exit(1);
+        }
+
+        if (functionStack.length > 1000) {
+            std.printf("[BSH] stack overflow %s\n", name);
+            std.exit(1);
+        }
+
+        const frame = new Map();
+        func.params.forEach((p, i) => frame.set(p, argVals[i]));
+
+        functionStack.push({
+            returnIndex: index + 1,
+            endIndex: func.endIndex,
+            scopeDepth: ctx.scopes.length,
+            prevBase: ctx.state.scopeBase,
+            retVar,
+            retIsLocal
+        });
+
+        ctx.scopes.push(frame);
+        ctx.state.scopeBase = ctx.scopes.length - 1;
+        index = func.startIndex + 1;
     }
 
     function evalCondition(tokens) {
@@ -90,6 +125,10 @@ export function run(ctx) {
                 } else if (ctx.methods[locVarAction]) {
                     const methodArgs = tokens.slice(4).map(t => ctx.getStrType(t));
                     ctx.setVar(locVarName, ctx.methods[locVarAction](...methodArgs), isLocal);
+                } else if (ctx.functions[locVarAction]) {
+                    // call function and assign result to variable
+                    callFn(locVarAction, tokens.slice(4), locVarName, isLocal);
+                    jumped = true;
                 } else {
                     ctx.setVar(locVarName, ctx.getStrType(locVarAction), isLocal);
                 }
@@ -198,7 +237,8 @@ export function run(ctx) {
                     std.exit(1);
                 }
 
-                returnFromFn();
+                const retVal = tokens.length > 1 ? ctx.getStrType(tokens[1]) : undefined;
+                returnFromFn(retVal);
                 jumped = true;
                 break;
             case 'import':
@@ -223,31 +263,7 @@ export function run(ctx) {
                     std.exit(1);
                 }
 
-                const argVals = tokens.slice(1).map(t => ctx.getStrType(t));
-
-                if (argVals.length !== func.params.length) {
-                    std.printf("[BSH] incorrect number of arguments for function '%s' on %s\n", instr, index);
-                    std.exit(1);
-                }
-
-                if (functionStack.length > 1000) {
-                    std.printf("[BSH] stack overflow %s\n", instr);
-                    std.exit(1);
-                }
-
-                const frame = new Map();
-                func.params.forEach((p, i) => frame.set(p, argVals[i]));
-
-                functionStack.push({
-                    returnIndex: index + 1,
-                    endIndex: func.endIndex,
-                    scopeDepth: ctx.scopes.length,
-                    prevBase: ctx.state.scopeBase
-                })
-
-                ctx.scopes.push(frame);
-                index = func.startIndex + 1;
-                ctx.state.scopeBase = ctx.scopes.length - 1;
+                callFn(instr, tokens.slice(1));
                 jumped = true;
             }
         }
