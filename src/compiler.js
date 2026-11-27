@@ -1,13 +1,40 @@
 import * as std from 'qjs:std';
 import * as os from 'qjs:os';
-import { lines, state, functions, blocks, bsh } from "./state.js";
+
+// ---------- tokenizer ----------
+
+export function parseLine(line) {
+  const tokens = [];
+  const regex = /"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g;
+  let match;
+
+  while ((match = regex.exec(line)) !== null) {
+    tokens.push(match[0]);
+  }
+
+  return tokens;
+}
+
+export function parseFnHeader(line) {
+  const m = line.match(/^fn\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*$/);
+  if (!m) { return null }
+  return { name: m[1], params: m[2].split(/[\s,]+/).filter(Boolean) }
+}
+
+// ---------- paths ----------
 
 const isAbs = (p) => /^([A-Za-z]:)?[\\/]/.test(p);
 const absPath = (p) =>
   isAbs(p) ? p : os.getcwd()[0].replace(/\\/g, "/") + "/" + p.replace(/^\.\//, "");
 
-//load js
-async function loadJS(path, builtin) {
+export function dirOf(path) {
+  const i = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
+  return i === -1 ? "." : path.slice(0, i)
+}
+
+// ---------- imports ----------
+
+async function loadJS(ctx, path, builtin) {
   let mod;
 
   try {
@@ -23,45 +50,13 @@ async function loadJS(path, builtin) {
   }
 
   if (typeof mod.default == "function") {
-    mod.default(bsh);
+    mod.default(ctx.bsh);
   }
 }
 
-
-
-//line parsing
-export function parseLine(line) {
-  const tokens = [];
-  const regex = /"[^"\\]*(?:\\.[^"\\]*)*"|\S+/g;
-  let match;
-
-  while ((match = regex.exec(line)) !== null) {
-    let token = match[0];
-
-    tokens.push(token);
-  }
-
-  return tokens;
-}
-
-export const parsedLines = [];
-
-export function parseFnHeader(line) {
-  const m = line.match(/^fn\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*$/);
-  if (!m) { return null }
-  return { name: m[1], params: m[2].split(/[\s,]+/).filter(Boolean) }
-}
-
-
-//importing functions from other files
 const loadedFiles = new Set();
 
-export function dirOf(path) {
-  const i = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\"));
-  return i === -1 ? "." : path.slice(0, i)
-}
-
-export async function addImports(source, basePath) {
+export async function addImports(ctx, source, basePath) {
   for (const raw of source) {
     const t = parseLine(raw);
     if (t[0] !== "import") continue;
@@ -79,7 +74,7 @@ export async function addImports(source, basePath) {
     loadedFiles.add(path);
 
     if (path.endsWith(".js")) {
-      await loadJS(path, builtin);
+      await loadJS(ctx, path, builtin);
       continue;
     }
 
@@ -91,33 +86,30 @@ export async function addImports(source, basePath) {
 
     const contentForImport = file.readAsString().split("\n");
     file.close();
-    await addImports(contentForImport, path);
-    lines.push(...contentForImport);
+    await addImports(ctx, contentForImport, path);
+    ctx.lines.push(...contentForImport);
     loadedFiles.add(path);
   }
 }
 
-export async function loadImports(filename) {
+export async function loadImports(ctx, filename) {
   loadedFiles.add(filename);
-  await addImports(lines.slice(0, state.mainLength), filename);
+  await addImports(ctx, ctx.lines.slice(0, ctx.state.mainLength), filename);
 }
 
-export function buildBlocks() {
+// ---------- blocks ----------
+
+export function buildBlocks(ctx) {
   const stack = [];
 
-  parsedLines.length = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim()
+  for (let i = 0; i < ctx.lines.length; i++) {
+    const line = ctx.lines[i].trim()
 
     if (!line || line.startsWith("--")) {
-      parsedLines[i] = [];
       continue;
     }
 
     const tokens = parseLine(line)
-    parsedLines[i] = tokens
-
     if (tokens.length === 0) {
       continue;
     }
@@ -125,7 +117,7 @@ export function buildBlocks() {
     if (tokens[0] === "fn") {
       const fnHeader = parseFnHeader(line)
       if (!fnHeader) {
-        std.printf("[BSH] invalid function header on %s\n", i + 1);
+        std.printf("[BSH] invalid function header on %s\n", i);
         std.exit(1);
       }
       stack.push({ kind: "fn", fnHeader, ifIndex: i, elseIndex: null })
@@ -151,7 +143,7 @@ export function buildBlocks() {
       }
 
       if (current.kind === "fn") {
-        functions[current.fnHeader.name] = {
+        ctx.functions[current.fnHeader.name] = {
           params: current.fnHeader.params,
           startIndex: current.ifIndex,
           endIndex: i
@@ -159,16 +151,16 @@ export function buildBlocks() {
       }
 
       if (current.kind === "while") {
-        blocks[i] = { whileIndex: current.ifIndex }
+        ctx.blocks[i] = { whileIndex: current.ifIndex }
       }
 
-      blocks[current.ifIndex] = {
+      ctx.blocks[current.ifIndex] = {
         elseIndex: current.elseIndex,
         endIndex: i
       };
 
       if (current.elseIndex !== null) {
-        blocks[current.elseIndex] = {
+        ctx.blocks[current.elseIndex] = {
           endIndex: i
         };
       }
@@ -178,5 +170,23 @@ export function buildBlocks() {
   if (stack.length > 0) {
     std.printf("[BSH] invalid syntax on %s\n", stack[stack.length - 1].ifIndex + 1);
     std.exit(1);
+  }
+}
+
+// Pre-tokenize every source line once at compile time.
+// The interpreter no longer trims or re-tokenizes on each iteration.
+// Each entry is either null (skip) or { tokens: string[] }.
+export function compile(ctx) {
+  ctx.compiled = new Array(ctx.lines.length);
+
+  for (let i = 0; i < ctx.lines.length; i++) {
+    const line = ctx.lines[i].trim();
+
+    if (!line || line.startsWith("--")) {
+      ctx.compiled[i] = null;
+      continue;
+    }
+
+    ctx.compiled[i] = { tokens: parseLine(line) };
   }
 }

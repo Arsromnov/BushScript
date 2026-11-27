@@ -1,2 +1,68 @@
-kramdown:
-  parse_block_html: true
+title: BushScript
+description: A lightweight scripting language
+url: https://arsromnov.github.io/BushScript
+baseurl: /BushScript
+
+remote_theme: pmarsceill/just-the-docs
+color_scheme: dark
+
+aux_links:
+  "BushScript on GitHub":
+    - "//github.com/Arsromnov/BushScript"
+  "Releases":
+    - "//github.com/Arsromnov/BushScript/releases"
+
+nav:
+  - title: Home
+    section: true
+    items:
+      - title: Welcome
+        url: /BushScript/docs/
+  - title: Basics
+    items:
+      - title: Syntax
+        url: /BushScript/docs/basics.html
+  - title: Modules
+    items:
+      - title: Math
+        url: /BushScript/docs/modules/math.html
+      - title: Str-utils
+        url: /BushScript/docs/modules/str-utils.html
+      - title: JSON
+        url: /BushScript/docs/modules/json.html
+      - title: BFS (filesystem)
+        url: /BushScript/docs/modules/bfs.html
+  - title: Library
+    items:
+      - title: Creating libraries
+        url: /BushScript/docs/library.html
+  - title: Packaging
+    items:
+      - title: Builds
+        url: /BushScript/docs/packaging.html
+  - title: Contributing
+    items:
+      - title: Contributing
+        url: /BushScript/docs/contributing.html
+
+last_edit_timestamp: true
+last_edit_time_format: "%b %e %Y at %I:%M %p"
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  profile: false
+  blank_lines: false
+  start_tag: [body, head, table, tbody, thead, tfoot, tr, td, th, ul, ol, li, pre]
+  ignore:
+    envs: [math]
+    elements: [pre]
+
+defaults:
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+      permalink: /:title.html
