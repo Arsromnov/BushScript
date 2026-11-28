@@ -1,4 +1,4 @@
-# Creating libraries
+# Libraries
 
 You can write BushScript libraries in either `.bsh` (BushScript) or `.js`
 (JavaScript, extending the language with new methods and commands).

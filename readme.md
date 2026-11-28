@@ -1,4 +1,4 @@
-# BushScript
+# BushScript repository
 ![BushScript](src/bsh_logo.ico) 
 
 

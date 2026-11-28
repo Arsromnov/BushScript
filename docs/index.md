@@ -1,4 +1,4 @@
-# BushScript
+# BushScript - index docs page
 
 A lightweight, embeddable scripting language with a simple syntax:
 variables, `if`/`else`, `while` loops, `goto`, functions, and imports.

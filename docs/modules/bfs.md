@@ -1,4 +1,4 @@
-# BFS module (filesystem)
+# STD module - BushFileSystem
 
 Import:
 

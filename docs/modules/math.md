@@ -1,4 +1,4 @@
-# Math module
+# STD module - Math
 
 Import:
 

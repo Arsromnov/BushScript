@@ -1,4 +1,4 @@
-# Str-utils module
+# STD module - Str-utils 
 
 Import:
 

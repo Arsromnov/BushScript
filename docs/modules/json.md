@@ -1,4 +1,4 @@
-# JSON module
+# STD module - JSON 
 
 Import:
 
